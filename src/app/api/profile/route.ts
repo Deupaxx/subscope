@@ -5,7 +5,23 @@ function extractPreloads(html: string): Record<string, unknown> {
   const idx = html.indexOf('JSON.parse("');
   if (idx === -1) throw new Error("Could not find _preloads in page HTML");
   const start = idx + 12;
-  const end = html.indexOf('")', start);
+
+  // Walk forward to find the first unescaped `")` — the closing delimiter.
+  // A naive indexOf('")', start) fails when the JSON contains `")` inside an
+  // escaped string value (e.g. a bio with `\\")`). We count backslashes before
+  // each `"` and skip it if it's escaped (odd number of preceding backslashes).
+  let end = -1;
+  let pos = start;
+  while (pos < html.length) {
+    const q = html.indexOf('")', pos);
+    if (q === -1) break;
+    let backslashes = 0;
+    let i = q - 1;
+    while (i >= 0 && html[i] === '\\') { backslashes++; i--; }
+    if (backslashes % 2 === 0) { end = q; break; }
+    pos = q + 1;
+  }
+
   if (end === -1) throw new Error("Could not find end of _preloads JSON");
   const escaped = html.slice(start, end);
   // The HTML embeds a double-encoded JSON string: JSON.parse("...escaped...")
