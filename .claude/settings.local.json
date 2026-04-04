@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://substack.com/@kaguuragichuru\")",
+      "Bash(node -e ':*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"none\" --yes)",
+      "Bash(mkdir -p _existing)",
+      "Bash(mv awsome.md start _existing/)",
+      "Bash(mkdir -p \"e:/PROJECT SWE/subscope-app\")",
+      "Read(//e/PROJECT SWE/**)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const p=JSON.parse\\(d\\); console.log\\('next:', p.dependencies.next, 'tailwind:', p.devDependencies.tailwindcss\\)\")",
+      "Bash(npm run:*)",
+      "Bash(curl -s \"http://localhost:3000/api/profile?handle=kaguuragichuru\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(taskkill /F /IM node.exe /FI \"WINDOWTITLE eq next*\")",
+      "Bash(node -e \" process.stdin.resume\\(\\); let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{ const o=JSON.parse\\(d\\); console.log\\('top note hearts:', o.topNotes?.[0]?.heartCount, '| body snippet:', o.topNotes?.[0]?.body?.slice\\(0,60\\)\\); console.log\\('notes returned:', o.topNotes?.length\\); console.log\\('oldest note date:', o.topNotes?.map\\(n=>n.date\\).sort\\(\\)[0]\\); }\\);\")"
+    ]
+  }
+}
