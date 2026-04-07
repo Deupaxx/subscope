@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
 import { LimelightNav, NavItem } from "../components/ui/limelight-nav";
-import { Heart, Repeat2, MessageCircle } from "lucide-react";
+import { Heart, Repeat2, MessageCircle, Github } from "lucide-react";
+import { Footer } from "../components/ui/footer";
 import { SubstackSearchBox } from "../components/ui/substack-search-box";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
 
@@ -503,12 +504,41 @@ export default function Home() {
       )}
 
       {/* ── Footer ── */}
-      <footer className="bg-[#fdf8f3] border-t border-[#ede8e0] py-6 px-4 mt-auto">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <span className="font-display italic font-black text-[#78716c] text-sm">SubScope</span>
-          <span className="text-[#a8a29e] text-xs">Open source · Made with ♥ · @kaguura</span>
-        </div>
-      </footer>
+      <Footer
+        className="bg-[#fdf8f3] border-t border-[#ede8e0] mt-auto"
+        logo={
+          <span className="flex items-center gap-1.5">
+            <span className="font-display italic font-black text-[#1c1917] text-lg leading-none">
+              SubScope
+            </span>
+            <span className="text-[#e97316] text-base leading-none">✦</span>
+          </span>
+        }
+        brandName="SubScope"
+        socialLinks={[
+          {
+            icon: <Github className="h-4 w-4" />,
+            href: "https://github.com/Deupaxx/subscope",
+            label: "GitHub",
+          },
+        ]}
+        mainLinks={[
+          { href: "#how-it-works", label: "How it works" },
+          {
+            href: "https://github.com/Deupaxx/subscope",
+            label: "GitHub",
+            external: true,
+          },
+          { href: "#", label: "☕ Buy me a coffee", external: true },
+        ]}
+        legalLinks={[
+          { href: "https://github.com/Deupaxx/subscope/blob/main/LICENSE", label: "MIT License" },
+        ]}
+        copyright={{
+          text: `© ${new Date().getFullYear()} SubScope`,
+          license: "Open source · Built by @deupaxx",
+        }}
+      />
 
     </div>
   );
