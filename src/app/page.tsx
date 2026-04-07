@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
 import { LimelightNav, NavItem } from "../components/ui/limelight-nav";
 import { Heart, Repeat2, MessageCircle } from "lucide-react";
+import { SubstackSearchBox } from "../components/ui/substack-search-box";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
 
 export default function Home() {
@@ -152,24 +153,13 @@ export default function Home() {
             Paste any handle and instantly see what&apos;s working — top posts, notes engagement, posting frequency, and audience size.
           </p>
 
-          {/* Search form */}
-          <form onSubmit={handleSubmit} className="flex gap-2 max-w-lg mx-auto mb-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="@handle or substack URL"
-              className="flex-1 bg-white border border-[#d6cfc6] rounded-lg px-4 py-3 text-sm text-[#1c1917] placeholder:text-[#a8a29e] focus:outline-none focus:ring-2 focus:ring-[#e97316]/30 focus:border-[#e97316] transition-colors"
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="bg-[#1c1917] text-white px-6 py-3 rounded-lg text-sm font-semibold disabled:opacity-40 hover:bg-[#292524] transition-colors whitespace-nowrap"
-            >
-              {loading ? "Loading..." : "Analyze →"}
-            </button>
-          </form>
-          <p className="text-[#a8a29e] text-xs">No login · No tracking · Free forever</p>
+          {/* Search box */}
+          <SubstackSearchBox
+            value={input}
+            onChange={setInput}
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
         </div>
 
         {/* Analytics results — conditionally shown after search */}
