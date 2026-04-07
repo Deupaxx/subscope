@@ -29,11 +29,39 @@ export interface NoteData {
   replyCount: number;
 }
 
+export interface Stats {
+  notesLast6Months: number;
+  postsLast3Months: number;
+  avgDailyNotes: number;    // over 6-month window
+  avgWeeklyPosts: number;   // over 3-month window
+}
+
 export interface ProfileResponse {
   profile: ProfileData;
   topPosts: PostData[];
   topNotes: NoteData[];
+  stats: Stats;
 }
+
+export interface ProfileChunk {
+  type: "profile";
+  profile: ProfileData;
+  topPosts: PostData[];
+}
+
+export interface ProgressChunk {
+  type: "progress";
+  pagesScanned: number;
+  notesFound: number;
+}
+
+export interface CompleteChunk {
+  type: "complete";
+  topNotes: NoteData[];
+  stats: Stats;
+}
+
+export type StreamChunk = ProfileChunk | ProgressChunk | CompleteChunk;
 
 export interface ApiError {
   error: string;
