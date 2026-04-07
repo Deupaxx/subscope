@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
+import { LimelightNav, NavItem } from "../components/ui/limelight-nav";
+import { Heart, Repeat2, MessageCircle } from "lucide-react";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
 
 export default function Home() {
@@ -18,6 +20,7 @@ export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [progress, setProgress] = useState<{ pagesScanned: number; notesFound: number } | null>(null);
   const [scanningNotes, setScanningNotes] = useState(false);
+  const [sortBy, setSortBy] = useState<"hearts" | "restacks" | "comments">("hearts");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,6 +35,7 @@ export default function Home() {
     setStats(null);
     setProgress(null);
     setScanningNotes(false);
+    setSortBy("hearts");
 
     try {
       const res = await fetch(`/api/profile?handle=${encodeURIComponent(val)}`);
@@ -340,41 +344,69 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Top notes */}
-                {topNotes.length > 0 && (
-                  <>
-                    <h3 className="text-base font-semibold text-gray-900 mb-3">
-                      Top 20 Notes by Hearts
-                    </h3>
-                    <ol className="space-y-2">
-                      {topNotes.map((note, i) => (
-                        <li
-                          key={note.id}
-                          className="bg-white border border-gray-200 rounded-lg px-4 py-4 flex gap-3 items-start"
-                        >
-                          <span className="text-gray-400 text-sm font-mono w-5 pt-0.5 shrink-0 text-right">
-                            {i + 1}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
-                              {note.body}
-                            </p>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                              <span>❤ {note.heartCount}</span>
-                              <span>🔁 {note.restacks}</span>
-                              {note.replyCount > 0 && (
-                                <span>💬 {note.replyCount}</span>
-                              )}
-                              <span className="ml-auto">
-                                {new Date(note.date).toLocaleDateString()}
-                              </span>
+                {/* Top notes — tabbed by sort mode */}
+                {topNotes.length > 0 && (() => {
+                  const noteNavItems: NavItem[] = [
+                    { id: "hearts",   icon: <Heart />,          label: "Hearts"   },
+                    { id: "restacks", icon: <Repeat2 />,        label: "Restacks" },
+                    { id: "comments", icon: <MessageCircle />,  label: "Comments" },
+                  ];
+                  const sortMap = { hearts: "heartCount", restacks: "restacks", comments: "replyCount" } as const;
+                  const sortedNotes = [...topNotes].sort(
+                    (a, b) => b[sortMap[sortBy]] - a[sortMap[sortBy]]
+                  );
+                  const tabIndex = noteNavItems.findIndex((n) => n.id === sortBy);
+                  return (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-base font-semibold text-gray-900">
+                          Top Notes
+                        </h3>
+                        <LimelightNav
+                          items={noteNavItems}
+                          defaultActiveIndex={tabIndex}
+                          onTabChange={(i) =>
+                            setSortBy(noteNavItems[i].id as "hearts" | "restacks" | "comments")
+                          }
+                          className="bg-[#fdf8f3] border-[#ede8e0]"
+                        />
+                      </div>
+                      <ol className="space-y-2">
+                        {sortedNotes.map((note, i) => (
+                          <li
+                            key={note.id}
+                            className="bg-white border border-gray-200 rounded-lg px-4 py-4 flex gap-3 items-start"
+                          >
+                            <span className="text-gray-400 text-sm font-mono w-5 pt-0.5 shrink-0 text-right">
+                              {i + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+                                {note.body}
+                              </p>
+                              <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                                <span className={`flex items-center gap-1 ${sortBy === "hearts" ? "text-[#e97316] font-semibold" : ""}`}>
+                                  <Heart size={11} /> {note.heartCount}
+                                </span>
+                                <span className={`flex items-center gap-1 ${sortBy === "restacks" ? "text-[#e97316] font-semibold" : ""}`}>
+                                  <Repeat2 size={11} /> {note.restacks}
+                                </span>
+                                {note.replyCount > 0 && (
+                                  <span className={`flex items-center gap-1 ${sortBy === "comments" ? "text-[#e97316] font-semibold" : ""}`}>
+                                    <MessageCircle size={11} /> {note.replyCount}
+                                  </span>
+                                )}
+                                <span className="ml-auto">
+                                  {new Date(note.date).toLocaleDateString()}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ol>
-                  </>
-                )}
+                          </li>
+                        ))}
+                      </ol>
+                    </>
+                  );
+                })()}
 
                 {/* No notes found (after scanning completes) */}
                 {!scanningNotes && topNotes.length === 0 && (

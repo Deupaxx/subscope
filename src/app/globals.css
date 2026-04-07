@@ -3,4 +3,12 @@
 @theme {
   --font-display: var(--font-playfair);
   --font-body: var(--font-dm-sans);
+  --color-card: #ffffff;
+  --color-foreground: #1c1917;
+  --color-primary: #e97316;
+}
+
+/* --primary (no prefix) used by limelight box-shadow */
+:root {
+  --primary: #e97316;
 }
