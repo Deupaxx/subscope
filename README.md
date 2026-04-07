@@ -1,100 +1,160 @@
-# SubScope
+# SubScope ✦
 
-Substack profile analytics. Enter any Substack handle or URL to see subscriber counts, follower counts, top posts, and top notes ranked by heart reactions.
+Free, open-source analytics for any Substack profile. Paste a handle or URL and instantly see top posts, top notes, and 6-month activity stats — streamed progressively as data arrives.
+
+**Live:** [subscope on GitHub](https://github.com/Deupaxx/subscope)
+
+---
 
 ## Features
 
-- **Flexible input** — accepts a bare handle (`kaguuragichuru`), `@handle`, `https://substack.com/@handle`, or `https://handle.substack.com`
-- **Profile stats** — name, avatar, bio, subscriber count, follower count, paid/free tier badge
-- **Top 10 posts** — sorted by heart reactions, with title, subtitle, restack count, and a direct link
-- **Top 10 notes** — sorted by heart reactions, with full note body, restack count, and reply count
-- **No CORS issues** — all Substack requests go through a Next.js API route
+- **Flexible input** — bare handle, `@handle`, `substack.com/@handle`, or `handle.substack.com`
+- **Profile card** — name, avatar, bio, subscriber count, follower count, paid/free badge
+- **Top 10 posts** — by heart reactions, with subtitle, restack count, paid badge, direct link
+- **Top 20 notes** — sortable by ❤ Hearts / 🔁 Restacks / 💬 Comments via limelight tab nav
+- **6-month activity stats** — notes last 6 months, posts last 3 months, avg daily notes, avg weekly posts
+- **Streaming UI** — results appear progressively via NDJSON stream; 3D cube loader during notes scan
+- **No login · No tracking · Free forever**
+
+---
 
 ## How it works
 
-1. The `/api/profile` route fetches `https://substack.com/@{handle}` server-side
-2. It parses the `window._preloads` JSON blob embedded in the page HTML to get profile data and the user ID
-3. Posts and notes are fetched in parallel:
-   - Posts: `https://substack.com/api/v1/profile/posts?profile_user_id={id}&limit=50`
-   - Notes: `https://substack.com/api/v1/reader/feed/profile/{id}?types=note&limit=50`
-4. Both are sorted by heart count and top 10 of each returned to the client
+The `/api/profile` route streams three NDJSON chunks to the client in order:
+
+| Chunk | When sent | Contains |
+|---|---|---|
+| `profile` | After profile page is scraped | Profile data + top 50 posts |
+| `progress` | Every 5 pages of notes | `pagesScanned`, `notesFound` |
+| `complete` | After all notes collected | Top 20 notes + activity stats |
+
+### Scraping strategy
+
+1. Fetches `substack.com/@{handle}` and parses the inline `window._preloads` JSON blob for profile data and user ID
+2. Posts come from `substack.com/api/v1/profile/posts?profile_user_id={id}&limit=50`
+3. Notes come from `substack.com/api/v1/reader/feed/profile/{id}?types=note` — cursor-paginated up to 200 pages, stopping early when notes older than 6 months are reached. Only `type: "comment"` items are counted (restacks/reposts are skipped)
+
+All Substack requests are made server-side to avoid CORS. A Chrome User-Agent is set on every request.
+
+---
 
 ## Stack
 
-- [Next.js 16](https://nextjs.org/) (App Router)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS v4](https://tailwindcss.com/)
+| | |
+|---|---|
+| Framework | [Next.js 16](https://nextjs.org/) (App Router, webpack mode) |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS v4 + Playfair Display / DM Sans (`next/font/google`) |
+| Animation | [Framer Motion](https://www.framer.com/motion/) |
+| Icons | [Lucide React](https://lucide.dev/) |
+| UI primitives | [@radix-ui/react-tooltip](https://www.radix-ui.com/) |
+
+---
 
 ## Getting started
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run build    # Production build
+npm run lint     # ESLint
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+> **Note:** The dev script runs `next dev --webpack` to avoid a Turbopack bug with paths that contain spaces on Windows. If your path has no spaces, you can remove `--webpack`.
+
+---
 
 ## Project structure
 
 ```
 src/
   app/
-    page.tsx              # Search UI + results (posts + notes)
-    layout.tsx            # Root layout
-    globals.css           # Tailwind import
+    page.tsx                    # Landing page + analytics UI (client component)
+    layout.tsx                  # Root layout — Playfair Display + DM Sans fonts
+    globals.css                 # Tailwind import + @theme font/color tokens
     api/
       profile/
-        route.ts          # Server-side Substack fetching + parsing
-  types.ts                # Shared TypeScript interfaces
+        route.ts                # Streaming NDJSON handler (maxDuration = 60)
+  components/
+    ui/
+      substack-search-box.tsx   # Dark pill search input (framer-motion animated)
+      prism-flux-loader.tsx     # 3D rotating cube loader (notes scan animation)
+      limelight-nav.tsx         # Sliding limelight tab nav (notes sort selector)
+  types.ts                      # StreamChunk discriminated union + shared types
 ```
+
+---
 
 ## API
 
 ### `GET /api/profile?handle=<input>`
 
-`<input>` can be any of:
-- `kaguuragichuru`
-- `@kaguuragichuru`
-- `https://substack.com/@kaguuragichuru`
-- `https://kaguura.substack.com`
+Accepts any of:
+- `deupaxx`
+- `@deupaxx`
+- `https://substack.com/@deupaxx`
+- `https://deupaxx.substack.com`
 
-Returns:
+Returns a streaming NDJSON response (`Content-Type: application/x-ndjson`). Each line is a JSON object with a `type` discriminant:
 
 ```ts
-{
-  profile: {
-    id: number;
-    name: string;
-    handle: string;
-    photo_url: string | null;
-    bio: string | null;
-    subscriberCount: string | null;   // e.g. "2.7K+"
-    subscriberCountNumber: number | null;
-    followerCount: number;
-    hasPaidTier: boolean;
-  };
-  topPosts: Array<{
-    title: string;
-    subtitle: string | null;
-    canonical_url: string;
-    heartCount: number;
-    restacks: number;
-    audience: string;   // "everyone" | "only_paid"
-    post_date: string;  // ISO date
-  }>;
-  topNotes: Array<{
-    id: number;
-    body: string;
-    date: string;       // ISO date
-    heartCount: number;
-    restacks: number;
-    replyCount: number;
-  }>;
-}
+// Chunk 1 — sent immediately
+{ type: "profile"; profile: ProfileData; topPosts: PostData[] }
+
+// Chunk 2 — sent every 5 pages during notes pagination
+{ type: "progress"; pagesScanned: number; notesFound: number }
+
+// Chunk 3 — sent when all notes are collected
+{ type: "complete"; topNotes: NoteData[]; stats: Stats }
 ```
 
-## Notes
+**Types:**
 
-- Substack does not provide an official public API. This tool relies on the `window._preloads` data blob and undocumented endpoints, which may change without notice.
-- Subscriber counts are only shown if the profile makes them public.
-- Notes are fetched from the reader feed API and may not include all historical notes if the account has many.
+```ts
+type ProfileData = {
+  id: number;
+  name: string;
+  handle: string;
+  photo_url: string | null;
+  bio: string | null;
+  subscriberCount: string | null;       // e.g. "2.7K+"
+  subscriberCountNumber: number | null;
+  followerCount: number;
+  hasPaidTier: boolean;
+};
+
+type PostData = {
+  title: string;
+  subtitle: string | null;
+  canonical_url: string;
+  heartCount: number;
+  restacks: number;
+  audience: "everyone" | "only_paid";
+  post_date: string;                    // ISO date
+};
+
+type NoteData = {
+  id: number;
+  body: string;
+  date: string;                         // ISO date
+  heartCount: number;
+  restacks: number;
+  replyCount: number;
+};
+
+type Stats = {
+  notesLast6Months: number;
+  postsLast3Months: number;
+  avgDailyNotes: string;                // e.g. "0.4"
+  avgWeeklyPosts: string;               // e.g. "1.2"
+};
+```
+
+---
+
+## Caveats
+
+- Substack has no official public API. This tool relies on `window._preloads` and undocumented endpoints that may change without notice.
+- Subscriber counts are only shown when the profile makes them public.
+- Notes pagination scans up to 200 pages; very prolific writers may have older notes not included.
+- Built by [@deupaxx](https://github.com/Deupaxx) — contributions welcome.
