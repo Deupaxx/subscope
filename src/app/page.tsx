@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
 
 export default function Home() {
@@ -325,16 +326,16 @@ export default function Home() {
 
                 {/* Notes scanning progress */}
                 {scanningNotes && (
-                  <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-md px-4 py-3 mb-6 text-sm flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Scanning notes...
+                  <div className="mb-6">
+                    <PrismFluxLoader
+                      size={36}
+                      speed={4}
+                      statuses={["Scanning notes", "Reading pages", "Sorting hearts", "Fetching data", "Almost there", "Finalizing"]}
+                    />
                     {progress && (
-                      <span className="ml-1">
-                        ({progress.notesFound} notes found, {progress.pagesScanned} pages scanned)
-                      </span>
+                      <p className="text-center text-xs text-[#a8a29e] mt-2">
+                        {progress.notesFound} notes found · {progress.pagesScanned} pages scanned
+                      </p>
                     )}
                   </div>
                 )}
