@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "./button";
 
 interface FooterProps {
   logo: React.ReactNode;
@@ -35,94 +34,80 @@ export function Footer({
   className,
 }: FooterProps) {
   return (
-    <footer className={`pb-8 pt-14 ${className ?? ""}`}>
-      <div className="px-6 lg:px-10 max-w-5xl mx-auto">
-        {/* Top row: logo left, social icons right */}
-        <div className="md:flex md:items-start md:justify-between">
+    <footer className={`w-full ${className ?? ""}`}>
+      {/* Thin rule to separate from support section content */}
+      <div className="mx-6 lg:mx-10 border-t border-white/[0.08]" />
+
+      <div className="px-6 lg:px-10 max-w-5xl mx-auto py-10">
+        {/* Single row: logo · nav links · social */}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+
+          {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-x-2 no-underline"
+            className="flex items-center gap-x-2 no-underline shrink-0"
             aria-label={brandName}
           >
             {logo}
           </Link>
-          <ul className="flex list-none mt-5 md:mt-0 space-x-2">
-            {socialLinks.map((link, i) => (
-              <li key={i}>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-9 w-9 rounded-full"
-                  asChild
-                >
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
-                  >
-                    {link.icon}
-                  </a>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        {/* Divider + bottom nav grid */}
-        <div className="border-t border-[#ede8e0] mt-6 pt-6 md:mt-5 md:pt-7 lg:grid lg:grid-cols-10">
-          {/* Main links */}
-          <nav className="lg:mt-0 lg:col-[4/11]">
-            <ul className="list-none flex flex-wrap -my-1 -mx-2 lg:justify-end">
-              {mainLinks.map((link, i) => (
-                <li key={i} className="my-1 mx-2 shrink-0">
-                  {link.external ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-[#1c1917] underline-offset-4 hover:underline"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <a
-                      href={link.href}
-                      className="text-sm text-[#1c1917] underline-offset-4 hover:underline"
-                    >
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
+          {/* Nav links — centered on desktop */}
+          <nav className="flex flex-wrap gap-x-6 gap-y-2">
+            {mainLinks.map((link, i) =>
+              link.external ? (
+                <a
+                  key={i}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#57534e] hover:text-[#a8a29e] transition-colors no-underline"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <a
+                  key={i}
+                  href={link.href}
+                  className="text-sm text-[#57534e] hover:text-[#a8a29e] transition-colors no-underline"
+                >
+                  {link.label}
+                </a>
+              )
+            )}
+            {legalLinks.map((link, i) => (
+              <a
+                key={`legal-${i}`}
+                href={link.href}
+                className="text-sm text-[#3d3935] hover:text-[#57534e] transition-colors no-underline"
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
 
-          {/* Legal links */}
-          {legalLinks.length > 0 && (
-            <div className="mt-4 lg:mt-0 lg:col-[4/11]">
-              <ul className="list-none flex flex-wrap -my-1 -mx-3 lg:justify-end">
-                {legalLinks.map((link, i) => (
-                  <li key={i} className="my-1 mx-3 shrink-0">
-                    <a
-                      href={link.href}
-                      className="text-sm text-[#78716c] underline-offset-4 hover:underline"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Copyright */}
-          <div className="mt-6 text-sm leading-6 text-[#a8a29e] whitespace-nowrap lg:mt-0 lg:row-[1/3] lg:col-[1/4]">
-            <div>{copyright.text}</div>
-            {copyright.license && (
-              <div className="text-[#78716c]">{copyright.license}</div>
-            )}
+          {/* Social icons */}
+          <div className="flex items-center gap-2 shrink-0">
+            {socialLinks.map((link, i) => (
+              <a
+                key={i}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={link.label}
+                className="flex items-center justify-center h-8 w-8 rounded-full text-[#57534e] hover:text-[#a8a29e] hover:bg-white/5 transition-all"
+              >
+                {link.icon}
+              </a>
+            ))}
           </div>
+        </div>
+
+        {/* Copyright — below, subtle */}
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <p className="text-xs text-[#3d3935]">{copyright.text}</p>
+          {copyright.license && (
+            <p className="text-xs text-[#3d3935]">{copyright.license}</p>
+          )}
         </div>
       </div>
     </footer>

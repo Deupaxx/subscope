@@ -5,7 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
 import { LimelightNav, NavItem } from "../components/ui/limelight-nav";
-import { Heart, Repeat2, MessageCircle, Github } from "lucide-react";
+import { Heart, Repeat2, MessageCircle } from "lucide-react";
+
+function GithubIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+    </svg>
+  );
+}
 import { Footer } from "../components/ui/footer";
 import { SubstackSearchBox } from "../components/ui/substack-search-box";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
@@ -139,7 +147,7 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="bg-[#fdf8f3] pt-16 pb-12 px-4">
+      <section className="bg-[#fdf8f3] pt-20 pb-16 px-4">
         {/* Centered hero text */}
         <div className="max-w-2xl mx-auto text-center">
           <div className="inline-block bg-[#fff7ed] border border-[#fed7aa] text-[#ea580c] text-xs font-bold tracking-widest uppercase px-3 py-1 rounded mb-6">
@@ -413,11 +421,10 @@ export default function Home() {
       {/* ── Landing sections — hidden while search is active ── */}
       {!profile && !loading && !error && (
         <>
-          <hr className="border-[#ede8e0]" />
-
           {/* Section 1: Who it's for */}
-          <section id="how-it-works" className="bg-[#fdf8f3] py-16 px-4">
+          <section id="how-it-works" className="bg-[#fdf8f3] pt-4 pb-20 px-4">
             <div className="max-w-4xl mx-auto">
+              <div className="border-t border-[#ede8e0] mb-16" />
               <p className="text-[#e97316] text-xs font-bold tracking-widest uppercase mb-3">
                 Who it&apos;s for
               </p>
@@ -477,10 +484,8 @@ export default function Home() {
             </div>
           </section>
 
-          <hr className="border-[#ede8e0]" />
-
           {/* Section 2: Support */}
-          <section className="bg-[#1c1917] py-16 px-4 text-center">
+          <section className="bg-[#1c1917] py-24 px-4 text-center">
             <div className="max-w-lg mx-auto">
               <h2 className="font-display font-black text-[#fdf8f3] text-3xl leading-tight mb-4">
                 Built by a creator,<br />
@@ -505,10 +510,10 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <Footer
-        className="bg-[#fdf8f3] border-t border-[#ede8e0] mt-auto"
+        className="bg-[#1c1917]"
         logo={
           <span className="flex items-center gap-1.5">
-            <span className="font-display italic font-black text-[#1c1917] text-lg leading-none">
+            <span className="font-display italic font-black text-[#fdf8f3] text-lg leading-none">
               SubScope
             </span>
             <span className="text-[#e97316] text-base leading-none">✦</span>
@@ -517,7 +522,7 @@ export default function Home() {
         brandName="SubScope"
         socialLinks={[
           {
-            icon: <Github className="h-4 w-4" />,
+            icon: <GithubIcon className="h-4 w-4" />,
             href: "https://github.com/Deupaxx/subscope",
             label: "GitHub",
           },
@@ -536,7 +541,7 @@ export default function Home() {
         ]}
         copyright={{
           text: `© ${new Date().getFullYear()} SubScope`,
-          license: "Open source · Built by @deupaxx",
+          license: "Open source · Built by @kaguura",
         }}
       />
 
