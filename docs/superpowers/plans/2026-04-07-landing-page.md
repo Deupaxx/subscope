@@ -1,111 +1,115 @@
-"use client";
+# SubScope Landing Page — Implementation Plan
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-export default function Home() {
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+**Goal:** Add a full landing page (sticky navbar, redesigned hero, "Who it's for" two-column section, dark support/CTA section, footer) to SubScope while keeping the existing streaming analytics results UI completely intact.
 
-  // Streamed state — populated progressively
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [topPosts, setTopPosts] = useState<PostData[]>([]);
-  const [topNotes, setTopNotes] = useState<NoteData[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [progress, setProgress] = useState<{ pagesScanned: number; notesFound: number } | null>(null);
-  const [scanningNotes, setScanningNotes] = useState(false);
+**Architecture:** Two files change. `layout.tsx` swaps Geist fonts for Playfair Display + DM Sans via CSS variables exposed on `<html>`. `globals.css` registers them as Tailwind utility classes (`font-display`, `font-body`). `page.tsx` gets a full return-statement rewrite — the analytics logic (state, `handleSubmit`) is untouched; only the JSX changes. Landing sections hide automatically when a search is active (`!profile && !loading && !error`).
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const val = input.trim();
-    if (!val) return;
+**Tech Stack:** Next.js 16, React 19, Tailwind CSS v4, `next/font/google`
 
-    setLoading(true);
-    setError(null);
-    setProfile(null);
-    setTopPosts([]);
-    setTopNotes([]);
-    setStats(null);
-    setProgress(null);
-    setScanningNotes(false);
+---
 
-    try {
-      const res = await fetch(`/api/profile?handle=${encodeURIComponent(val)}`);
+## File Map
 
-      // Non-streamed error response (JSON)
-      if (!res.ok) {
-        const json = await res.json();
-        setError((json as { error: string }).error ?? "Something went wrong");
-        setLoading(false);
-        return;
-      }
+| File | What changes |
+|---|---|
+| `src/app/layout.tsx` | Remove Geist; add Playfair Display + DM Sans as CSS variables `--font-playfair` / `--font-dm-sans` |
+| `src/app/globals.css` | Add `@theme` block registering `font-display` and `font-body` Tailwind utilities |
+| `src/app/page.tsx` | Full JSX rewrite (return statement only — state + handleSubmit untouched) |
 
-      // Streamed NDJSON response
-      const reader = res.body?.getReader();
-      if (!reader) {
-        setError("Browser does not support streaming responses");
-        setLoading(false);
-        return;
-      }
+---
 
-      const decoder = new TextDecoder();
-      let buffer = "";
+## Task 1: Fonts
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+**Files:**
+- Modify: `src/app/layout.tsx`
+- Modify: `src/app/globals.css`
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? ""; // keep incomplete last line in buffer
+- [ ] **Step 1: Rewrite `src/app/layout.tsx`**
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const chunk = JSON.parse(line) as StreamChunk;
-            switch (chunk.type) {
-              case "profile":
-                setProfile(chunk.profile);
-                setTopPosts(chunk.topPosts);
-                setLoading(false); // profile is loaded, show it
-                setScanningNotes(true);
-                break;
-              case "progress":
-                setProgress({ pagesScanned: chunk.pagesScanned, notesFound: chunk.notesFound });
-                break;
-              case "complete":
-                setTopNotes(chunk.topNotes);
-                setStats(chunk.stats);
-                setScanningNotes(false);
-                setProgress(null);
-                break;
-            }
-          } catch {
-            // skip malformed lines
-          }
-        }
-      }
-    } catch {
-      setError("Network error — could not reach server");
-      setLoading(false);
-    }
-  }
+```tsx
+import type { Metadata } from "next";
+import { Playfair_Display, DM_Sans } from "next/font/google";
+import "./globals.css";
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  style: ["normal", "italic"],
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+export const metadata: Metadata = {
+  title: "SubScope — Substack Analytics",
+  description: "Analyze any Substack profile: top posts, subscriber counts, and more.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  );
+}
+```
+
+- [ ] **Step 2: Rewrite `src/app/globals.css`**
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-dm-sans);
+}
+```
+
+`font-display` → Playfair Display. `font-body` → DM Sans. Both are now valid Tailwind utility classes.
+
+- [ ] **Step 3: Verify fonts load**
+
+Check http://localhost:3000 — page still renders (no crash). Open DevTools → Network → filter by "font" — you should see Next.js self-hosting `Playfair_Display` and `DM_Sans` font files under `/_next/static/media/`.
+
+---
+
+## Task 2: Full page.tsx JSX rewrite
+
+**Files:**
+- Modify: `src/app/page.tsx`
+
+The analytics logic (all `useState` declarations and the entire `handleSubmit` function) is **not touched**. Only the `return (...)` block is replaced.
+
+- [ ] **Step 1: Replace the entire `return (...)` block**
+
+Find the line `return (` and everything from there to the closing `);` of the return statement (the last `);` before the closing `}` of `Home()`). Replace it with the following complete JSX:
+
+```tsx
   return (
     <div className="min-h-screen bg-[#fdf8f3] flex flex-col font-body">
 
       {/* ── Navbar ── */}
       <nav className="sticky top-0 z-50 bg-[#fdf8f3] border-b border-[#ede8e0]">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1.5 no-underline">
+          <a href="/" className="flex items-center gap-1.5 no-underline">
             <span className="font-display italic font-black text-[#1c1917] text-lg leading-none">
               SubScope
             </span>
             <span className="text-[#e97316] text-base leading-none">✦</span>
-          </Link>
+          </a>
           <div className="flex items-center gap-6">
             <a
               href="#how-it-works"
@@ -489,4 +493,100 @@ export default function Home() {
 
     </div>
   );
-}
+```
+
+- [ ] **Step 2: Verify the page renders**
+
+Check http://localhost:3000. Expected:
+- Sticky navbar: "SubScope ✦" italic serif left, three links right
+- Large Playfair Display headline: "Substack has / no analytics. / *Now it does.*" (last line italic orange)
+- Styled search box (white rounded input + dark "Analyze →" button)
+- "No login · No tracking · Free forever" muted note
+- Below: "Who it's for" section with two white cards (Writers / Researchers) with orange `→` bullets
+- Dark section: "Built by a creator, *for creators.*" + orange coffee button
+- Footer
+
+- [ ] **Step 3: Verify "How it works" smooth scroll**
+
+Click "How it works" in the navbar. The page should scroll down to the "Who it's for" section (it has `id="how-it-works"`).
+
+- [ ] **Step 4: Verify analytics flow still works**
+
+Submit a Substack handle (e.g. `kaguura`). Expected:
+1. "Who it's for" and Support sections disappear immediately
+2. Loading skeleton shows
+3. Profile card + posts stream in
+4. Notes scan progress bar appears
+5. Notes list populates
+All identical to before — just in the new cream-background layout.
+
+---
+
+## Task 3: Lint, commit, push
+
+**Files:** All modified files
+
+- [ ] **Step 1: Run lint**
+
+```bash
+cd "d:/PROJECT SWE/subscope/subscope"
+npm run lint
+```
+
+Expected: no errors. Common issues and fixes:
+- `'` in JSX text → already escaped as `&apos;` in the plan above
+- Unused imports → check if `Geist`/`Geist_Mono` were fully removed from layout.tsx
+
+- [ ] **Step 2: Commit**
+
+```bash
+cd "d:/PROJECT SWE/subscope/subscope"
+git add src/app/layout.tsx src/app/globals.css src/app/page.tsx \
+  docs/superpowers/plans/2026-04-07-landing-page.md \
+  docs/superpowers/specs/2026-04-07-landing-page-design.md \
+  .gitignore
+git commit -m "$(cat <<'EOF'
+feat: landing page — navbar, hero, who-it's-for, support, footer
+
+Warm creator aesthetic: Playfair Display headlines, DM Sans body,
+cream #fdf8f3 background, orange #e97316 accent.
+
+- Sticky navbar: italic serif logo, smooth-scroll links, coffee CTA
+- Hero: editorial headline 'Substack has no analytics. Now it does.'
+  with italic orange accent, styled search box
+- 'Who it's for': two-column Writers/Researchers card grid with
+  orange arrow bullets; hides when analytics results are active
+- Support: dark #1c1917 section, open-source CTA
+- Footer: minimal, italic logo left, credit right
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+EOF
+)"
+```
+
+- [ ] **Step 3: Push**
+
+```bash
+git push
+```
+
+---
+
+## Color Reference
+
+| Token | Hex | Usage |
+|---|---|---|
+| Cream bg | `#fdf8f3` | Page background, navbar, hero, footer |
+| Stone-900 | `#1c1917` | Primary text, button bg, support section bg |
+| Stone-500 | `#78716c` | Secondary text, nav links |
+| Stone-400 | `#a8a29e` | Muted text, footer credit |
+| Stone-600 | `#57534e` | Support section footnote |
+| Border | `#ede8e0` | Dividers, card borders, nav border |
+| Card bg | `#ffffff` | Who-it's-for cards |
+| Orange accent | `#e97316` | Italic color, arrow bullets, badge, CTA button |
+| Orange light bg | `#fff7ed` | Badge bg, coffee pill bg |
+| Orange border | `#fed7aa` | Badge border, coffee pill border |
+| Orange text | `#ea580c` | Badge text, coffee pill text |
+| Orange hover | `#d96d11` | CTA button hover state |
+| Input border | `#d6cfc6` | Search box border |
+| Support headline | `#fdf8f3` | Headline text on dark section |
