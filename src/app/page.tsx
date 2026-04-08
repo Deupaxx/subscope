@@ -16,6 +16,7 @@ function GithubIcon({ className }: { className?: string }) {
 }
 import { Footer } from "../components/ui/footer";
 import { SubstackSearchBox } from "../components/ui/substack-search-box";
+import { GLSLHills } from "../components/ui/glsl-hills";
 import type { ProfileData, PostData, NoteData, Stats, StreamChunk } from "../types";
 
 export default function Home() {
@@ -147,9 +148,28 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="bg-[#fdf8f3] pt-20 pb-16 px-4">
-        {/* Centered hero text */}
-        <div className="max-w-2xl mx-auto text-center">
+      <section className="relative bg-[#fdf8f3] pt-20 pb-16 px-4 overflow-hidden">
+        {/* Hills — warm sand ambient texture */}
+        <GLSLHills
+          color={[0.72, 0.58, 0.44]}
+          speed={0.35}
+          cameraZ={130}
+        />
+        {/* Radial vignette — dissolves hills toward edges */}
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, rgba(253,248,243,0.55) 55%, rgba(253,248,243,0.92) 80%, #fdf8f3 100%)",
+          }}
+        />
+        {/* Bottom fade — bleeds into next section */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none z-10"
+          style={{ background: "linear-gradient(to bottom, transparent, #fdf8f3)" }}
+        />
+        {/* Content */}
+        <div className="relative z-20 max-w-2xl mx-auto text-center">
           <div className="inline-block bg-[#fff7ed] border border-[#fed7aa] text-[#ea580c] text-xs font-bold tracking-widest uppercase px-3 py-1 rounded mb-6">
             Substack Analytics
           </div>
@@ -161,8 +181,6 @@ export default function Home() {
           <p className="text-[#78716c] text-base leading-relaxed mb-8 max-w-md mx-auto">
             Paste any handle and instantly see what&apos;s working — top posts, notes engagement, posting frequency, and audience size.
           </p>
-
-          {/* Search box */}
           <SubstackSearchBox
             value={input}
             onChange={setInput}
@@ -170,10 +188,12 @@ export default function Home() {
             loading={loading}
           />
         </div>
+      </section>
 
-        {/* Analytics results — conditionally shown after search */}
-        {(error || loading || profile) && (
-          <div className="max-w-2xl mx-auto mt-10 text-left">
+      {/* Analytics results — conditionally shown after search */}
+      {(error || loading || profile) && (
+        <section className="bg-[#fdf8f3] px-4 pb-16">
+          <div className="max-w-2xl mx-auto mt-4 text-left">
 
             {/* Error */}
             {error && (
@@ -415,8 +435,8 @@ export default function Home() {
             )}
 
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* ── Landing sections — hidden while search is active ── */}
       {!profile && !loading && !error && (
