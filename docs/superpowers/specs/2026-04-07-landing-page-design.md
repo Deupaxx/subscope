@@ -57,7 +57,7 @@ Full-width, sticky top. `background: #fdf8f3`, `border-bottom: 1px solid #ede8e0
 **Right links (DM Sans, small, `#78716c`):**
 - "How it works" → smooth-scrolls to Section 1
 - "GitHub" → links to repo (external)
-- "☕ Buy me a coffee" → pill button, `background: #fff7ed`, `color: #ea580c`, `border: 1px solid #fed7aa` → placeholder `#` link for now (kaguura will add BMC link later)
+- "☕ Buy me a coffee" → pill button, `background: #fff7ed`, `color: #ea580c`, `border: 1px solid #fed7aa` → placeholder `#` link for now (deupaxx will add BMC link later)
 
 ---
 
@@ -139,7 +139,7 @@ for creators.
 `background: #fdf8f3`, `border-top: 1px solid #ede8e0`. Flex row, space-between.
 
 - **Left:** `SubScope` in Playfair Display italic, `#78716c`
-- **Right:** `Open source · Made with ♥ · @kaguura` — DM Sans, small, `#a8a29e`
+- **Right:** `Open source · Made with ♥ · @deupaxx` — DM Sans, small, `#a8a29e`
 
 ---
 
@@ -160,4 +160,4 @@ The existing analytics results (profile card, posts list, notes list) stay on th
 - Dark mode
 - Animations beyond CSS transitions on nav hover states
 - Mobile responsiveness (not explicitly requested — keep layout sensible but don't optimize for mobile yet)
-- Actual Buy Me a Coffee URL (kaguura will add later — use `#` placeholder)
+- Actual Buy Me a Coffee URL (deupaxx will add later — use `#` placeholder)

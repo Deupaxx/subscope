@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PrismFluxLoader } from "../components/ui/prism-flux-loader";
 import { LimelightNav, NavItem } from "../components/ui/limelight-nav";
-import { Heart, Repeat2, MessageCircle } from "lucide-react";
+import { Heart, Repeat2, MessageCircle, Copy, Check, PenLine, Search, ExternalLink } from "lucide-react";
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -32,6 +32,14 @@ export default function Home() {
   const [progress, setProgress] = useState<{ pagesScanned: number; notesFound: number } | null>(null);
   const [scanningNotes, setScanningNotes] = useState(false);
   const [sortBy, setSortBy] = useState<"hearts" | "restacks" | "comments">("hearts");
+  const [copiedNoteId, setCopiedNoteId] = useState<number | null>(null);
+
+  function copyNote(id: number, body: string) {
+    navigator.clipboard.writeText(body).then(() => {
+      setCopiedNoteId(id);
+      setTimeout(() => setCopiedNoteId(null), 1500);
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -141,7 +149,7 @@ export default function Home() {
               href="#"
               className="bg-[#fff7ed] text-[#ea580c] border border-[#fed7aa] text-xs font-semibold px-3 py-1.5 rounded no-underline hover:bg-[#ffedd5] transition-colors"
             >
-              ☕ Buy me a coffee
+              Buy me a coffee
             </a>
           </div>
         </div>
@@ -335,8 +343,8 @@ export default function Home() {
                             </p>
                           )}
                           <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                            <span>❤ {post.heartCount}</span>
-                            <span>🔁 {post.restacks}</span>
+                            <span className="flex items-center gap-1"><Heart size={11} /> {post.heartCount}</span>
+                            <span className="flex items-center gap-1"><Repeat2 size={11} /> {post.restacks}</span>
                             {post.audience === "only_paid" && (
                               <span className="text-amber-600 font-medium">Paid</span>
                             )}
@@ -415,8 +423,27 @@ export default function Home() {
                                     <MessageCircle size={11} /> {note.replyCount}
                                   </span>
                                 )}
-                                <span className="ml-auto">
-                                  {new Date(note.date).toLocaleDateString()}
+                                <span className="ml-auto flex items-center gap-2">
+                                  <span>{new Date(note.date).toLocaleDateString()}</span>
+                                  <button
+                                    onClick={() => copyNote(note.id, note.body)}
+                                    title="Copy note"
+                                    className="text-gray-300 hover:text-gray-500 transition-colors"
+                                  >
+                                    {copiedNoteId === note.id
+                                      ? <Check size={12} className="text-green-500" />
+                                      : <Copy size={12} />
+                                    }
+                                  </button>
+                                  <a
+                                    href={note.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="View on Substack"
+                                    className="text-gray-300 hover:text-gray-500 transition-colors"
+                                  >
+                                    <ExternalLink size={12} />
+                                  </a>
                                 </span>
                               </div>
                             </div>
@@ -442,9 +469,8 @@ export default function Home() {
       {!profile && !loading && !error && (
         <>
           {/* Section 1: Who it's for */}
-          <section id="how-it-works" className="bg-[#fdf8f3] pt-4 pb-20 px-4">
+          <section id="how-it-works" className="bg-[#fdf8f3] pt-16 pb-20 px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="border-t border-[#ede8e0] mb-16" />
               <p className="text-[#e97316] text-xs font-bold tracking-widest uppercase mb-3">
                 Who it&apos;s for
               </p>
@@ -457,7 +483,7 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Writers card */}
                 <div className="bg-white border border-[#ede8e0] rounded-xl p-6">
-                  <div className="text-2xl mb-3">✍️</div>
+                  <div className="mb-3"><PenLine className="h-6 w-6 text-[#e97316]" /></div>
                   <h3 className="font-display font-bold text-[#1c1917] text-xl mb-2">
                     For Writers
                   </h3>
@@ -480,7 +506,7 @@ export default function Home() {
 
                 {/* Researchers card */}
                 <div className="bg-white border border-[#ede8e0] rounded-xl p-6">
-                  <div className="text-2xl mb-3">🔍</div>
+                  <div className="mb-3"><Search className="h-6 w-6 text-[#e97316]" /></div>
                   <h3 className="font-display font-bold text-[#1c1917] text-xl mb-2">
                     For Researchers
                   </h3>
@@ -518,7 +544,7 @@ export default function Home() {
                 href="#"
                 className="inline-block bg-[#e97316] text-white font-bold px-8 py-3 rounded-lg text-sm hover:bg-[#d96d11] transition-colors no-underline"
               >
-                ☕ Buy me a coffee
+                Buy me a coffee
               </a>
               <p className="text-[#57534e] text-xs mt-4">
                 or star it on GitHub — both mean a lot
@@ -554,14 +580,15 @@ export default function Home() {
             label: "GitHub",
             external: true,
           },
-          { href: "#", label: "☕ Buy me a coffee", external: true },
+          { href: "#", label: "Buy me a coffee", external: true },
         ]}
         legalLinks={[
+          { href: "/terms", label: "Terms & Conditions" },
           { href: "https://github.com/Deupaxx/subscope/blob/main/LICENSE", label: "MIT License" },
         ]}
         copyright={{
           text: `© ${new Date().getFullYear()} SubScope`,
-          license: "Open source · Built by @kaguura",
+          license: "Open source · Built by @deupaxx",
         }}
       />
 

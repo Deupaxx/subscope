@@ -60,7 +60,7 @@ export function Footer({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#57534e] hover:text-[#a8a29e] transition-colors no-underline"
+                  className="text-sm text-[#a8a29e] hover:text-[#d6d3d1] transition-colors no-underline"
                 >
                   {link.label}
                 </a>
@@ -68,7 +68,7 @@ export function Footer({
                 <a
                   key={i}
                   href={link.href}
-                  className="text-sm text-[#57534e] hover:text-[#a8a29e] transition-colors no-underline"
+                  className="text-sm text-[#a8a29e] hover:text-[#d6d3d1] transition-colors no-underline"
                 >
                   {link.label}
                 </a>
@@ -78,7 +78,7 @@ export function Footer({
               <a
                 key={`legal-${i}`}
                 href={link.href}
-                className="text-sm text-[#3d3935] hover:text-[#57534e] transition-colors no-underline"
+                className="text-sm text-[#78716c] hover:text-[#a8a29e] transition-colors no-underline"
               >
                 {link.label}
               </a>
@@ -94,7 +94,7 @@ export function Footer({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={link.label}
-                className="flex items-center justify-center h-8 w-8 rounded-full text-[#57534e] hover:text-[#a8a29e] hover:bg-white/5 transition-all"
+                className="flex items-center justify-center h-8 w-8 rounded-full text-[#a8a29e] hover:text-[#d6d3d1] hover:bg-white/5 transition-all"
               >
                 {link.icon}
               </a>
@@ -104,9 +104,9 @@ export function Footer({
 
         {/* Copyright — below, subtle */}
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-          <p className="text-xs text-[#3d3935]">{copyright.text}</p>
+          <p className="text-xs text-[#78716c]">{copyright.text}</p>
           {copyright.license && (
-            <p className="text-xs text-[#3d3935]">{copyright.license}</p>
+            <p className="text-xs text-[#78716c]">{copyright.license}</p>
           )}
         </div>
       </div>

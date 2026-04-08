@@ -487,7 +487,7 @@ Find the line `return (` and everything from there to the closing `);` of the re
       <footer className="bg-[#fdf8f3] border-t border-[#ede8e0] py-6 px-4 mt-auto">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <span className="font-display italic font-black text-[#78716c] text-sm">SubScope</span>
-          <span className="text-[#a8a29e] text-xs">Open source · Made with ♥ · @kaguura</span>
+          <span className="text-[#a8a29e] text-xs">Open source · Made with ♥ · @deupaxx</span>
         </div>
       </footer>
 
@@ -512,7 +512,7 @@ Click "How it works" in the navbar. The page should scroll down to the "Who it's
 
 - [ ] **Step 4: Verify analytics flow still works**
 
-Submit a Substack handle (e.g. `kaguura`). Expected:
+Submit a Substack handle (e.g. `deupaxx`). Expected:
 1. "Who it's for" and Support sections disappear immediately
 2. Loading skeleton shows
 3. Profile card + posts stream in

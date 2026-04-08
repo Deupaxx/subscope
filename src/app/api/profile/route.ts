@@ -211,13 +211,15 @@ export async function GET(
       const topNotes: NoteData[] = allNotes
         .map((item) => {
           const c = (item as Record<string, unknown>).comment as Record<string, unknown>;
+          const noteId = c.id as number;
           return {
-            id: c.id as number,
+            id: noteId,
             body: (c.body as string) ?? "",
             date: (c.date as string) ?? "",
             heartCount: (c.reaction_count as number) ?? 0,
             restacks: (c.restacks as number) ?? 0,
             replyCount: (c.children_count as number) ?? 0,
+            url: `https://substack.com/@${handle}/note/c-${noteId}`,
           };
         })
         .sort((a, b) => b.heartCount - a.heartCount)

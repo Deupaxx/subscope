@@ -151,7 +151,7 @@ git commit -m "feat: add shared TypeScript types"
 - Create: `src/app/api/profile/route.ts`
 
 This route:
-1. Accepts `GET /api/profile?handle=kaguuragichuru`
+1. Accepts `GET /api/profile?handle=deupaxx`
 2. Fetches `https://substack.com/@{handle}` with a browser User-Agent
 3. Extracts `window._preloads` JSON blob from the HTML
 4. Fetches `https://substack.com/api/v1/profile/posts?profile_user_id={id}&limit=50`
@@ -288,11 +288,11 @@ export async function GET(
 cd "e:/PROJECT SWE/subscope"
 npm run dev &
 sleep 5
-curl "http://localhost:3000/api/profile?handle=kaguuragichuru" | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8'); const o=JSON.parse(d); console.log('name:', o.profile?.name, 'posts:', o.topPosts?.length);"
+curl "http://localhost:3000/api/profile?handle=deupaxx" | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8'); const o=JSON.parse(d); console.log('name:', o.profile?.name, 'posts:', o.topPosts?.length);"
 kill %1
 ```
 
-Expected output: `name: Kaguura Gichuru posts: 10` (or however many posts exist)
+Expected output: `name: deupaxx posts: 10` (or however many posts exist)
 
 - [ ] **Step 3: Commit**
 
@@ -376,7 +376,7 @@ export default function Home() {
             type="text"
             value={handle}
             onChange={(e) => setHandle(e.target.value)}
-            placeholder="Substack handle (e.g. kaguuragichuru)"
+            placeholder="Substack handle (e.g. deupaxx)"
             className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
@@ -538,7 +538,7 @@ cd "e:/PROJECT SWE/subscope"
 npm run dev
 ```
 
-Open `http://localhost:3000`, enter `kaguuragichuru`, click Analyze.
+Open `http://localhost:3000`, enter `deupaxx`, click Analyze.
 
 Expected: Profile card shows name, avatar, subscriber/follower counts, paid/free badge, and a numbered list of up to 10 posts with heart + restack counts.
 

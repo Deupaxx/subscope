@@ -27,6 +27,7 @@ export interface NoteData {
   heartCount: number;
   restacks: number;
   replyCount: number;
+  url: string;
 }
 
 export interface Stats {
